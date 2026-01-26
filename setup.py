@@ -1,0 +1,31 @@
+from setuptools import setup, find_packages
+
+setup(
+    name="denoising_project",
+    version="0.1.0",
+    packages=find_packages(),
+    python_requires='>=3.9',
+    install_requires=[
+        'torch>=2.5.1',
+        'torchvision>=0.20.1',
+        'torchaudio>=2.5.1',
+        'opencv-python>=4.11.0',
+        'Pillow>=11.0.0',
+        'scikit-image>=0.24.0',
+        'imageio>=2.37.0',
+        'numpy>=1.26.4',
+        'scipy>=1.13.1',
+        'tqdm>=4.67.1',
+        'pyyaml>=6.0.2',
+        'einops>=0.8.1',
+        'addict>=2.4.0',
+        'lpips>=0.1.4',
+        'pytorch-ssim>=0.1',
+        'ptflops>=0.7.4',
+        'torchsummary>=1.5.1',
+        'yacs>=0.1.8',
+        'matplotlib>=3.9.2',
+    ],
+    description="Image Denoising with HybridNet - SIDD Dataset",
+    author="Ahhyun",
+)
