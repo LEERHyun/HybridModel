@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from arch_util import LayerNorm2d
+from arch.arch_util import LayerNorm2d
 from local_arch import Local_Base
 import numbers
 from einops import rearrange
@@ -627,3 +627,4 @@ if __name__ == '__main__':
 
     print(f"Custom MACS: {macs}, PARAMS:{params}")
     
+
