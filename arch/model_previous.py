@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from arch.arch_util import LayerNorm2d
-from local_arch import Local_Base
 import numbers
 from einops import rearrange
 import torchsummary
@@ -424,17 +423,6 @@ class NAFNet(nn.Module):
         x = F.pad(x, (0, mod_pad_w, 0, mod_pad_h))
         return x
 
-class NAFNetLocal(Local_Base, NAFNet):
-    def __init__(self, *args, train_size=(1, 3, 256, 256), fast_imp=False, **kwargs):
-        Local_Base.__init__(self)
-        NAFNet.__init__(self, *args, **kwargs)
-
-        N, C, H, W = train_size
-        base_size = (int(H * 1.5), int(W * 1.5))
-
-        self.eval()
-        with torch.no_grad():
-            self.convert(base_size=base_size, train_size=train_size, fast_imp=fast_imp)
 #----------------------------------------------------------------------------------------
 #HybridModel
 #----------------------------------------------------------------------------------------
@@ -627,4 +615,5 @@ if __name__ == '__main__':
 
     print(f"Custom MACS: {macs}, PARAMS:{params}")
     
+
 
