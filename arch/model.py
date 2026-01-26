@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from arch_util import LayerNorm2d
+from arch.arch_util import LayerNorm2d
 import numbers
 from einops import rearrange
 import torchsummary
