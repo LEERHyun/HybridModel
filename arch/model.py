@@ -464,12 +464,12 @@ class HybridSplitNet(nn.Module):
         
         skip1_t, skip1_c = t1, c1
         
-        t1 = self.downsample1_t1(t1)  # [32, H/2, W/2]
-        c1 = self.downsample1_c1(c1)  # [32, H/2, W/2]
+        t1 = self.downsample1_t1(t1)  # [64, H/2, W/2]
+        c1 = self.downsample1_c1(c1)  # [64, H/2, W/2]
         
         
-        t1_1,t1_2 = t1.chunk(2, dim=1)
-        c1_1,c1_2= c1.chunk(2,dim=1)   
+        t1_1,t1_2 = t1.chunk(2, dim=1) # [32, H/2, W/2]
+        c1_1,c1_2= c1.chunk(2,dim=1)   # [32, H/2, W/2]
         
         # ============ Stage 2 ============
         t2_1 = self.stage2_transformer1(t1_1)  # [32]
@@ -480,25 +480,25 @@ class HybridSplitNet(nn.Module):
         skip2_t1, skip2_t2 = t2_1, t2_2
         skip2_c1, skip2_c2 = c2_1, c2_2
         
-        t2_1 = self.downsample2_t1(t2_1)  # [32, H/4, W/4]
+        t2_1 = self.downsample2_t1(t2_1)  # [64, H/4, W/4]
         c2_1 = self.downsample2_c1(c2_1)
         t2_2 = self.downsample2_t2(t2_2)
         c2_2 = self.downsample2_c2(c2_2)
            
-        t3_1,t3_2 = t2_1.chunk(2, dim=1)
+        t3_1,t3_2 = t2_1.chunk(2, dim=1) # [32, H/4, W/4]
         t3_3,t3_4 = t2_2.chunk(2, dim=1)
         c3_1,c3_2 = c2_1.chunk(2, dim=1)
         c3_3,c3_4 = c2_2.chunk(2, dim=1)
         # ============ Stage 3 ============
-        t3_1 = self.stage3_transformer1(t3_1)  # [B, 32, H/4, W/8]
-        t3_2 = self.stage3_transformer2(t3_2)  # [B, 32, H/4, W/8]
-        t3_3 = self.stage3_transformer3(t3_3)  # [B, 32, H/4, W/8]
-        t3_4 = self.stage3_transformer4(t3_4)  # [B, 32, H/4, W/8]
+        t3_1 = self.stage3_transformer1(t3_1)  # [B, 32, H/4, W/4]
+        t3_2 = self.stage3_transformer2(t3_2) 
+        t3_3 = self.stage3_transformer3(t3_3)  
+        t3_4 = self.stage3_transformer4(t3_4)  
         
-        c3_1 = self.stage3_cnn1(c3_1)  # [B, 32, H/4, W/8]
-        c3_2 = self.stage3_cnn2(c3_2)  # [B, 32, H/4, W/8]
-        c3_3 = self.stage3_cnn3(c3_3)  # [B, 32, H/4, W/8]
-        c3_4 = self.stage3_cnn4(c3_4)  # [B, 32, H/4, W/8]
+        c3_1 = self.stage3_cnn1(c3_1) 
+        c3_2 = self.stage3_cnn2(c3_2)  
+        c3_3 = self.stage3_cnn3(c3_3) 
+        c3_4 = self.stage3_cnn4(c3_4)  
         
         skip3_t1 = t3_1
         skip3_t2 = t3_2
@@ -509,29 +509,29 @@ class HybridSplitNet(nn.Module):
         skip3_c3 = c3_3
         skip3_c4 = c3_4
         
-        t3_1 = self.downsample3_t1(t3_1)  # [B, 32, H/8, W/8]
-        t3_2 = self.downsample3_t2(t3_2)  # [B, 32, H/8, W/8]
-        t3_3 = self.downsample3_t3(t3_3)  # [B, 32, H/8, W/8]
-        t3_4 = self.downsample3_t4(t3_4)  # [B, 32, H/8, W/8]
-        c3_1 = self.downsample3_c1(c3_1)  # [B, 32, H/8, W/8]
-        c3_2 = self.downsample3_c2(c3_2)  # [B, 32, H/8, W/8]
-        c3_3 = self.downsample3_c3(c3_3)  # [B, 32, H/8, W/8]
-        c3_4 = self.downsample3_c4(c3_4)  # [B, 32, H/8, W/8]
+        t3_1 = self.downsample3_t1(t3_1)  # [B, 64, H/8, W/8]
+        t3_2 = self.downsample3_t2(t3_2) 
+        t3_3 = self.downsample3_t3(t3_3)  
+        t3_4 = self.downsample3_t4(t3_4)  
+        c3_1 = self.downsample3_c1(c3_1)  
+        c3_2 = self.downsample3_c2(c3_2)  
+        c3_3 = self.downsample3_c3(c3_3)  
+        c3_4 = self.downsample3_c4(c3_4)  
         
         # Split for Bottleneck (8개)
-        t4_1, t4_2 = t3_1.chunk(2, dim=1)  # [B, 32, H/8, W/16] each
-        t4_3, t4_4 = t3_2.chunk(2, dim=1)  # [B, 32, H/8, W/16] each
-        t4_5, t4_6 = t3_3.chunk(2, dim=1)  # [B, 32, H/8, W/16] each
-        t4_7, t4_8 = t3_4.chunk(2, dim=1)  # [B, 32, H/8, W/16] each
+        t4_1, t4_2 = t3_1.chunk(2, dim=1)  # [B, 32, H/8, W/8] each
+        t4_3, t4_4 = t3_2.chunk(2, dim=1)  
+        t4_5, t4_6 = t3_3.chunk(2, dim=1)  
+        t4_7, t4_8 = t3_4.chunk(2, dim=1)  
         
-        c4_1, c4_2 = c3_1.chunk(2, dim=1)  # [B, 32, H/8, W/16] each
-        c4_3, c4_4 = c3_2.chunk(2, dim=1)  # [B, 32, H/8, W/16] each
-        c4_5, c4_6 = c3_3.chunk(2, dim=1)  # [B, 32, H/8, W/16] each
-        c4_7, c4_8 = c3_4.chunk(2, dim=1)  # [B, 32, H/8, W/16] each
+        c4_1, c4_2 = c3_1.chunk(2, dim=1)  
+        c4_3, c4_4 = c3_2.chunk(2, dim=1) 
+        c4_5, c4_6 = c3_3.chunk(2, dim=1)  
+        c4_7, c4_8 = c3_4.chunk(2, dim=1)  
         
         
         # ============ Bottleneck ============
-        bt1 = self.bottleneck_transformer1(t4_1)
+        bt1 = self.bottleneck_transformer1(t4_1) # [B, 32, H/8, W/8]
         bt2 = self.bottleneck_transformer2(t4_2)
         bt3 = self.bottleneck_transformer3(t4_3)
         bt4 = self.bottleneck_transformer4(t4_4)
@@ -552,7 +552,7 @@ class HybridSplitNet(nn.Module):
         # ============ Decoder Stage 3 ============
         
         # Concat pairs (8개 → 4개)
-        dt3_1 = concat_tensor(bt1, bt2)  # [B, 32, H/4, W/8]
+        dt3_1 = concat_tensor(bt1, bt2)  # [B, 64, H/8, W/8]
         dt3_2 = concat_tensor(bt3, bt4)
         dt3_3 = concat_tensor(bt5, bt6)
         dt3_4 = concat_tensor(bt7, bt8)
@@ -563,7 +563,7 @@ class HybridSplitNet(nn.Module):
         dc3_4 = concat_tensor(bc7, bc8)
         # Upsample
 
-        dt3_1 = self.upsample3_t1(dt3_1)  # [B, 32, H/4, W/16]
+        dt3_1 = self.upsample3_t1(dt3_1)  # [B, 32, H/4, W/4]
         dt3_2 = self.upsample3_t2(dt3_2)
         dt3_3 = self.upsample3_t3(dt3_3)
         dt3_4 = self.upsample3_t4(dt3_4)
@@ -575,7 +575,7 @@ class HybridSplitNet(nn.Module):
         
         
         # Skip connection + process
-        dt3_1 = dt3_1 + skip3_t1
+        dt3_1 = dt3_1 + skip3_t1 # [B, 32, H/4, W/4]
         dt3_2 = dt3_2 + skip3_t2
         dt3_3 = dt3_3 + skip3_t3
         dt3_4 = dt3_4 + skip3_t4
@@ -598,13 +598,13 @@ class HybridSplitNet(nn.Module):
         # ============ Decoder Stage 2 ============
         
         # Concat pairs (4개 → 2개)
-        dt2_1 = concat_tensor(dt3_1, dt3_2)  # [B, 32, H/2, W/4]
+        dt2_1 = concat_tensor(dt3_1, dt3_2)  # [B, 64, H/4, W/4]
         dt2_2 = concat_tensor(dt3_3, dt3_4)
         
         dc2_1 = concat_tensor(dc3_1, dc3_2)
         dc2_2 = concat_tensor(dc3_3, dc3_4)
         # Upsample
-        dt2_1 = self.upsample2_t1(dt2_1)  # [B, 32, H/2, W/8]
+        dt2_1 = self.upsample2_t1(dt2_1)  # [B, 32, H/2, W/2]
         dt2_2 = self.upsample2_t2(dt2_2)
         dc2_1 = self.upsample2_c1(dc2_1)
         dc2_2 = self.upsample2_c2(dc2_2)
@@ -626,11 +626,11 @@ class HybridSplitNet(nn.Module):
         # ============ Decoder Stage 1: 2개 → concat → 1개 ============
         
         # Concat pairs (2개 → 1개)
-        dt1 = concat_tensor(dt2_1, dt2_2)  # [B, 32, H, W/2]
+        dt1 = concat_tensor(dt2_1, dt2_2)  # [B, 64, H/2, W/2]
         dc1 = concat_tensor(dc2_1, dc2_2)
         
         # Upsample
-        dt1 = self.upsample1_t1(dt1)  # [B, 32, H, W/4]
+        dt1 = self.upsample1_t1(dt1)  #[B, 32, H, W]
         
         dc1 = self.upsample1_c1(dc1)
         
@@ -1321,5 +1321,6 @@ if __name__ == '__main__':
     macs = float(macs[:-4])
 
     print(f"Custom MACS: {macs}, PARAMS:{params}")
+
 
     
