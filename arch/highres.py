@@ -55,18 +55,6 @@ class HighResWrapper(nn.Module):
 
     
 class HighResWrapper_Pooling(nn.Module):
-    """
-    Wrap Light_SplitNet for high-resolution input via pixel-space downsampling.
-    
-    Pipeline:
-        input [B, 3, H, W]
-        → PixelUnshuffle(4)       [B, 3*16, H/4, W/4]
-        → proj_in  (1×1 Conv)     [B, base_channels, H/4, W/4]
-        → Light_SplitNet          [B, base_channels, H/4, W/4]  (내부적으로 3ch input/output 가정이므로 조정 필요)
-        → proj_out (1×1 Conv)     [B, 3*16, H/4, W/4]
-        → PixelShuffle(4)         [B, 3, H, W]
-        + residual                [B, 3, H, W]
-    """
 
     def __init__(self, base_channels: int = 32, scale: int = 4):
         super().__init__()
