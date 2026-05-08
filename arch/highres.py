@@ -108,32 +108,6 @@ if __name__ == '__main__':
     #Model Summary
     
     torchsummary.summary(custom,(3,1024,1024))
-    #Inference Time
-    # GPU 측정
-    input_tensor = torch.randn(1, 3, 1024, 1024).to(device)
-    # Warmup
-    with torch.no_grad():
-        for _ in range(10):
-            _ = custom(input_tensor)
-
-    # CUDA를 사용한 inference time 측정
-    starter = torch.cuda.Event(enable_timing=True)
-    ender = torch.cuda.Event(enable_timing=True)
-    num_iterations = 100
-    timings = []
-    with torch.no_grad():
-        starter.record()
-        output = custom(input_tensor)
-        ender.record()
-        # GPU 동기화
-        
-    torch.cuda.synchronize()
-    curr_time = starter.elapsed_time(ender)  # milliseconds
-
-
-    print(f"Inference time (GPU): {curr_time:.2f} ms")
-    
-
     # Model Complexity
     from ptflops import get_model_complexity_info
     
